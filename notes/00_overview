@@ -1,0 +1,74 @@
+# 학습 개요 및 정리 방향
+
+이 노트는 실무와 개인 학습을 통해 다룬 내용을 **정리하고 체계화**하기 위한 목적입니다.  
+GitHub와 Tistory 블로그에 병행 업로드하며, 단순한 이론 나열보다는 실험과 연결된 **기억에 남는 정리**를 지향합니다.
+
+---
+
+## 1. 전체 학습 흐름
+
+AI 관련 내용은 실제 개발 및 배포 흐름을 따르며 다음과 같은 5단계로 구성됩니다:
+
+1. **데이터 전처리 (Preprocessing)**  
+   - 1D 신호 데이터의 분할, 정규화, 증강 등  
+   - 실시간 센서 기반 처리 vs 클라우드 처리 비교
+
+2. **모델 구조 이해 (Model Structure)**  
+   - **기본 구조**:  
+     - CNN: 합성곱 기반 피처 추출 구조  
+     - RNN: 시계열/시퀀스 처리 구조 (LSTM, GRU 등)  
+     - Transformer: Attention 기반 구조의 핵심 메커니즘  
+   - **응용 구조**:  
+     - SwinTransformer 1D: Shifted window 기반 계층 구조  
+     - ConvNeXt 1D: Conv 기반의 Transformer 대체 구조  
+     - 경량 모델 및 엣지 디바이스 최적화 구조
+
+3. **학습 방법론 (Learning Methods)**  
+   - Supervised / Self-Supervised / Knowledge Distillation  
+   - Loss 설계, Teacher → Student 모델 구성
+
+4. **학습 및 평가 (Training & Evaluation)**  
+   - 실험 로그 관리, 하이퍼파라미터 튜닝  
+   - 모델 성능 평가, ablation study 설계
+
+5. **배포 및 최적화 (Deployment)**  
+   - 클라우드 vs 엣지 배포 전략  
+   - PyTorch → ONNX/TFLite 변환, latency & memory 최적화
+
+---
+
+## 2. 정리 분야별 흐름
+
+### (1) Signal Processing
+- [x] FFT: 주파수 분석 기초 개념과 실습
+- [ ] Filtering: FIR/IIR, Bandpass 등 필터 종류 정리
+- [ ] Feature Extraction: RMS, Peak, Spectral Entropy 등
+- [ ] Normalization & Denoising
+
+### (2) AI / ML
+- [ ] 데이터 전처리 및 시계열 입력 구성
+- [ ] 모델 구조 정리  
+  - CNN / RNN / Transformer  
+  - Swin / ConvNeXt 구조 분석 및 비교
+- [ ] 학습 전략: Self-Supervised, Distillation 등
+- [ ] 실험 및 평가 전략 정리
+- [ ] 배포 전략: Cloud vs Edge, ONNX 변환 등
+
+### (3) Statistics
+- [ ] 기초 통계 개념: 평균, 분산, 분포 해석
+- [ ] 가설 검정: t-test, ANOVA
+- [ ] 회귀 분석 및 설명력
+- [ ] 실험 설계 및 유의성 해석
+
+---
+
+## 3. 문서 구조 계획
+
+- `notes/`: 이론 정리 및 블로그 초안
+- `notebooks/`: 실험 코드 및 결과 시각화
+- `projects/`: 토이 프로젝트 및 모델 실험
+- `blog_backup/`: Tistory 블로그 글 백업용
+
+---
+
+> "정리는 학습의 끝이 아니라, 다음 실험과 응용을 위한 출발점이다."
