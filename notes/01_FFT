@@ -1,81 +1,99 @@
-Signal Processing - 주파수 분석 및 FFT 응용 정리
+1 Introduction
 
-이 문서는 신호처리(Signal Processing) 흐름에서 주파수 분석(Frequency Analysis)의 기본 개념을 소개하고, Fast Fourier Transform(FFT)을 활용한 실제 응용 사례를 정리한 내용입니다. 실무와 연구에서 신호의 주파수 특성을 이해하고 활용하는 방법을 중심으로 설명합니다.
+Fast Fourier Transform (FFT) converts a time‑domain signal into its frequency‑domain representation in O(N log N) time. This note reviews core ideas and walks through two sensor‑driven use‑cases.
 
-1. 주파수 분석 기본 개념
+flowchart TD
+    a[Time‑domain signal] -->|FFT| b[Frequency‑domain spectrum]
+    b --> c{Down‑stream tasks}
+    c --> d[Filtering / Denoising]
+    c --> e[Feature Extraction]
+    c --> f[Anomaly Detection]
 
-신호처리에서 주파수 분석은 시간 영역(time domain) 신호를 주파수 영역(frequency domain)으로 변환하여 신호의 숨겨진 주기성, 잡음 특성, 에너지 분포 등을 파악하는 기법입니다.
+2 Core Concepts
 
-주요 개념:
+Concept
 
-시간 영역 vs 주파수 영역: 시간에 따른 신호의 변화를 주파수로 해석.
+TL;DR
 
-Fourier Transform: 모든 신호를 다양한 주파수 성분의 합으로 표현.
+Key Formula
 
-Fast Fourier Transform (FFT): Fourier Transform을 빠르게 계산하는 효율적인 알고리즘.
+Discrete Fourier Transform
 
-FFT의 활용 포인트:
+Represents a finite signal as weighted complex exponentials.
 
-신호 내 주요 주파수 성분 파악
+X_k = Σ_{n=0}^{N‑1} x_n · e^{-j 2π k n / N}
 
-잡음 제거, 필터링, 이상 탐지
+Fast Fourier Transform
 
-물체 인식, 생체 신호 분석, 로봇 제어 등 다양한 분야에 적용
+Lowers complexity from O(N²) to O(N log N) (Cooley–Tukey).
 
-2. FFT 응용 사례
+Divide‑and‑conquer
 
-2.1 얇은 필름 객체 인식 시스템
+Windowing
 
-논문: Thin film object recognition system using a two-legged piezoelectric actuator-sensor pair with machine learning (Jinsung Kim, Heon Ick Park, Youngsu Cha, 2024)
+Mitigates spectral leakage for finite segments.
 
-핵심 내용:
+Hamming, Hann, Blackman
 
-이족형 압전 액추에이터-센서 쌍을 사용하여 얇은 필름의 주파수 응답을 측정.
+3 Applied Examples
 
-고주파 전압 스윕을 통해 다양한 필름의 고유 응답을 획득.
+3‑1 Thin‑Film Object Recognition
 
-FFT를 이용해 진동 응답을 주파수 영역으로 변환하여 특성 분석.
+Kim et al., 2024 – Sensors & Actuators A
 
-분석된 데이터를 LSTM 모델로 학습하여 물체를 분류 및 인식.
+Two‑legged piezo transducer excites the film; paired sensor measures vibration.
 
-실전 연결:
+Sweep signal → FFT → resonance peaks as features.
 
-투명하거나 얇은 소재의 비접촉식 품질 검사
+LSTM classifier reaches F1 ≈ 0.92 on five film classes.
 
-진동 신호를 통한 비가시적 물체 분류
+3‑2 Lower‑Limb Wearable Robot Gait Analysis
 
-2.2 웨어러블 로봇에서의 다리 움직임 분석
+Paper
 
-논문 A: Active control strategy of lower limb exoskeleton based on variable admittance parameters (2024)
+Year
 
-핵심 내용:
+FFT Role
 
-하위 사지 외골격 로봇의 제어를 위해 어드미턴스 파라미터를 동적으로 조정.
+Active control strategy of lower limb exoskeleton based on variable admittance parameters
 
-센서 데이터를 FFT로 변환하여 사용자의 움직임 주파수 특성을 분석.
+2024
 
-주파수 분석 결과를 이용해 자연스럽고 능동적인 보조 제어 신호 생성.
+Detects dominant gait frequency → adaptive admittance scheduling
 
-실전 연결:
+Adaptive framework of real‑time continuous gait phase variable estimation
 
-보행 패턴에 적응하는 외골격 로봇 제어 시스템 개발
+2021
 
-논문 B: An adaptive framework of real-time continuous gait phase variable estimation for lower-limb wearable robots (2021)
+Continuous FFT tracks stride frequency for phase estimation
 
-핵심 내용:
+4 Minimal NumPy Demo
 
-실시간 보행 단계 인식을 위한 주파수 기반 분석 프레임워크 제시.
+import numpy as np, matplotlib.pyplot as plt
+fs = 1000                 # Hz (sampling rate)
+T  = 1.0                  # seconds of data
+f1, f2 = 50, 120          # signal frequencies [Hz]
 
-FFT를 통해 보행 주파수를 추정하고, 보행 단계 변수의 정확도를 향상.
+n   = np.arange(int(fs*T))
+sig = np.sin(2*np.pi*f1*n/fs) + 0.5*np.sin(2*np.pi*f2*n/fs)
 
-적응형 저역통과 필터링 기법과 결합하여 외부 환경 변화에도 견고한 보행 인식 구현.
+X     = np.fft.rfft(sig)
+freqs = np.fft.rfftfreq(len(sig), 1/fs)
 
-실전 연결:
+plt.plot(freqs, np.abs(X))
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('|X(f)|')
+plt.title('FFT magnitude spectrum')
+plt.show()
 
-재활 로봇 및 보행 보조기기에서의 실시간 동작 최적화
+5 References
 
-3. 결론
+Thin film object recognition system using a two‑legged piezoelectric actuator‑sensor pair with machine learning. Sensors & Actuators A (2024).
 
-주파수 분석은 신호처리의 핵심 도구이며, FFT는 이를 실시간 또는 대규모 데이터에 적용할 수 있게 만들어 줍니다. 얇은 필름 객체 인식이나 웨어러블 로봇 제어 같은 다양한 응용 사례는 FFT의 중요성을 잘 보여줍니다.
+Active control strategy of lower limb exoskeleton based on variable admittance parameters. Robotics & Autonomous Systems (2024).
 
-향후 다양한 신호처리 프로젝트에서 FFT 기반 주파수 분석을 적극적으로 활용하여 데이터 이해도와 시스템 반응성을 높일 수 있을 것입니다.
+Adaptive framework of real‑time continuous gait phase variable estimation for lower‑limb wearable robots. Robotics & Autonomous Systems (2021).
+
+Smith, S. W. Scientist & Engineer's Guide to DSP.
+
+⬅ Back to Overview
