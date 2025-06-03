@@ -1,0 +1,87 @@
+1 Introduction
+
+Filtering is a fundamental step in sensor signal processing and AI pipelines. It enables noise reduction, feature isolation, and enhances downstream analysis (e.g. anomaly detection, classification). This note summarizes the core concepts behind digital filters and reviews common filter types including FIR, IIR, and Bandpass filters.
+
+flowchart TD
+    a[Raw Sensor Signal] -->|FFT| b[Frequency-domain Analysis]
+    b --> c{Filtering Tasks}
+    c --> d[Low-pass Filter]
+    c --> e[High-pass Filter]
+    c --> f[Band-pass / Band-stop Filter]
+
+2 Core Concepts
+
+Concept
+
+TL;DR
+
+Key Points
+
+Finite Impulse Response (FIR) Filter
+
+Output depends only on a finite number of past input samples.
+- Linear phase possible
+- Always stable
+- Often requires higher filter order
+
+Infinite Impulse Response (IIR) Filter
+
+Output depends on both past input and past output samples.
+- Efficient implementation (lower order)
+- Possible phase distortion
+- Potential stability issues (pole locations)
+
+Filter Types
+
+Categorize filters based on their frequency selectivity:
+- Low-pass: removes high-frequency noise
+- High-pass: removes low-frequency drift
+- Band-pass: isolates specific frequency band
+- Band-stop: removes specific unwanted frequencies
+
+Windowing
+
+Applies to FIR design or frequency-domain filtering:
+- Mitigates spectral leakage
+- Common windows: Hamming, Hann, Blackman
+
+3 Applied Examples
+
+3-1 Wearable Gait Analysis
+
+- FFT reveals dominant gait frequency in 1-3 Hz range.
+- Band-pass filter (1-3 Hz) isolates walking signal from noise.
+- Adaptive exoskeleton uses filtered signal to optimize assistance.
+
+3-2 Thin-Film Vibration Classification
+
+- Piezo actuator excites thin film; sensor captures vibration.
+- FFT spectrum reveals resonant peaks.
+- Band-pass filter isolates resonance region.
+- LSTM classifier trained on filtered signal achieves ~92% accuracy.
+
+4 Minimal NumPy Demo
+
+```python
+import numpy as np, scipy.signal as signal, matplotlib.pyplot as plt
+fs = 1000                  # Hz (sampling rate)
+T  = 1.0                   # seconds of data
+f1, f2 = 50, 120           # frequencies [Hz]
+
+n   = np.arange(int(fs*T))
+sig = np.sin(2*np.pi*f1*n/fs) + 0.5*np.sin(2*np.pi*f2*n/fs)
+
+# Design a low-pass FIR filter (cutoff 100 Hz)
+nyq = 0.5 * fs
+cutoff = 100 / nyq
+fir_coeff = signal.firwin(numtaps=101, cutoff=cutoff)
+
+filtered_sig = signal.lfilter(fir_coeff, 1.0, sig)
+
+plt.plot(n/fs, sig, label='Raw Signal')
+plt.plot(n/fs, filtered_sig, label='Filtered Signal')
+plt.xlabel('Time [s]')
+plt.ylabel('Amplitude')
+plt.legend()
+plt.title('FIR Filtered Signal')
+plt.show()
